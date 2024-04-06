@@ -1,5 +1,13 @@
 ## 基础
 
+### 复制构造函数不能值传递
+
+因为值传递一个类，相当于要用复制构造来构造实参，所以相当于复制构造调用了复制构造自身，这样不断递归下去
+
+所以编译器不允许复制构造函数的参数是值传递
+
+[value para in copy ctor](./testing/value_para_in_copy_ctor.cpp)
+
 ### 所有数组类型的参数都会退化为指针类型
 
 [array para decay to pointer](./testing/array_para_decay_to_pointer.cpp)
