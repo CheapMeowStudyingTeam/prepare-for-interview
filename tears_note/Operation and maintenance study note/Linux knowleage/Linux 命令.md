@@ -337,7 +337,7 @@ Red Hat Enterprise Linux release 8.0 (Ootpa)
 
 用于显示目录中的文件信息，英文全称为“list”，语法格式为“ls [参数] [文件名称]”
 
-![WXWorkCapture_17246457382970](\prepare-for-interview\tears_note\Operation and maintenance study note\Linux knowleage\assets\WXWorkCapture_17246457382970-1724651842388-5.png)
+![ls指令说明](.\assets\WXWorkCapture_17246457382970-1724651842388-5.png)  
 
 ```
 [root@linuxprobe ~]# ls -al
