@@ -197,3 +197,175 @@ Red Hat Enterprise Linux release 8.0 (Ootpa)
 用于显示数据包到达目的主机时途中经过的所有路由信息，语法格式为“tracepath [参数] 域名”
 
 当两台主机之间无法正常ping通时，要考虑两台主机之间是否有错误的路由信息，导致数据被某一台设备错误地丢弃。这时便可以使用tracepath命令追踪数据包到达目的主机时途中的所有路由信息，以分析是哪台设备出了问题。
+
+eg:
+
+```shell
+[root@linuxprobe ~]# tracepath www.linuxprobe.com
+ 1?: [LOCALHOST]                                          pmtu 1500
+ 1:  no reply
+ 2:  11.223.0.189                                          5.954ms asymm  1 
+ 3:  11.223.0.14                                           6.256ms asymm  2 
+ 4:  11.220.159.62                                         3.313ms asymm  3 
+ 5:  116.251.107.13                                        1.841ms 
+ 6:  140.205.50.237                                        2.416ms asymm  5 
+ 7:  101.95.211.117                                        2.772ms 
+ 8:  101.95.208.45                                        40.839ms 
+ 9:  101.95.218.217                                       13.898ms asymm  8 
+10:  202.97.81.162                                         8.113ms asymm  9 
+11:  221.229.193.238                                      15.693ms asymm 10 
+12:  no reply
+13:  no reply
+14:  no reply
+15:  no reply
+16:  no reply
+17:  no reply
+18:  no reply
+```
+
+就可以从11这个ip查找相关原因。
+
+### 15、netstat
+
+用于显示如网络连接、路由表、接口状态等的网络相关信息，英文全称为“network status”，语法格式为“netstat [参数]”
+
+netstat命令中的参数以及作用
+
+| 参数 | 作用                     |
+| ---- | ------------------------ |
+| -a   | 显示所有连接中的Socket   |
+| -p   | 显示正在使用的Socket信息 |
+| -t   | 显示TCP协议的连接状态    |
+| -u   | 显示UDP协议的连接状态    |
+| -n   | 使用IP地址，不使用域名   |
+| -l   | 仅列出正在监听的服务状态 |
+| -i   | 显示网卡列表信息         |
+| -r   | 显示路由表信息           |
+
+eg：
+
+```shell
+[root@linuxprobe ~]# netstat -a
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State      
+tcp        0      0 0.0.0.0:ssh             0.0.0.0:*               LISTEN     
+tcp        0      0 localhost:ipp           0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:sunrpc          0.0.0.0:*               LISTEN     
+tcp6       0      0 [::]:ssh                [::]:*                  LISTEN     
+tcp6       0      0 localhost:ipp           [::]:*                  LISTEN     
+tcp6       0      0 [::]:sunrpc             [::]:*                  LISTEN     
+udp        0      0 0.0.0.0:bootps          0.0.0.0:*                          
+udp        0      0 0.0.0.0:sunrpc          0.0.0.0:*                          
+udp        0      0 0.0.0.0:mdns            0.0.0.0:*                          
+udp        0      0 0.0.0.0:37396           0.0.0.0:*                          
+udp6       0      0 [::]:sunrpc             [::]:*                             
+udp6       0      0 [::]:mdns               [::]:*                             
+udp6       0      0 [::]:38541              [::]:*       
+```
+
+### 16、history命令
+
+用于显示执行过的命令历史，语法格式为“history [-c]”
+
+执行history命令能显示出当前用户在本地计算机中执行过的最近1000条命令记录。如果觉得1000不够用，可以自定义/etc/profile文件中的HISTSIZE变量值。在使用history命令时，可以使用-c参数清空所有的命令历史记录。还可以使用“!编码数字”的方式来重复执行某一次的命令
+
+```shell
+[root@linuxprobe ~]# history
+1 ifconfig
+2 uname -a
+3 cat /etc/redhat-release
+4 uptime
+5 free -h
+6 who
+7 last
+8 ping -c 192.168.10.10
+9 ping -c 192.168.10.20
+10 tracepath www.linuxprobe.com
+11 netstat -a
+12 netstat -i
+13 history
+[root@linuxprobe ~]# !3
+cat /etc/redhat-release
+Red Hat Enterprise Linux release 8.0 (Ootpa)
+```
+
+清空当前用户在本机上执行的Linux命令历史记录信息，可执行如下命令
+
+```shell
+# history -c
+```
+
+### 17、sosreport
+
+用于收集系统配置及架构信息并输出诊断文档，输入该命令后按回车键执行即可。
+
+
+
+## **查找定位文件命令**
+
+### 18、pwd
+
+用于显示用户当前所处的工作目录，英文全称为“print working directory”
+
+```shell
+[root@linuxprobe etc]# pwd
+/etc
+```
+
+### 19、cd
+
+用于切换当前的工作路径，英文全称为“change directory”，语法格式为“cd [参数] [目录]”
+
+用“cd -”命令返回到上一次所处的目录，使用“cd ..”命令进入上级目录，以及使用“cd ~”命令切换到当前用户的家目录，抑或使用“cd ~username”命令切换到其他用户的家目录
+
+返回到上一次的目录（即/etc目录）
+
+```
+[root@linuxprobe bin]# cd -
+/etc
+[root@linuxprobe etc]#
+```
+
+可以通过下面的命令快速切换到用户的家目录：
+
+```shell
+[root@linuxprobe etc]# cd ~
+[root@linuxprobe ~]#
+```
+
+### 20.ls
+
+用于显示目录中的文件信息，英文全称为“list”，语法格式为“ls [参数] [文件名称]”
+
+![WXWorkCapture_17246457382970](C:\Users\fanghaofu\AppData\Local\Temp\WXWorkCapture_17246457382970.png)
+
+```
+[root@linuxprobe ~]# ls -al
+total 48
+dr-xr-x---. 15 root root 4096 Jul 24 06:33 .
+dr-xr-xr-x. 17 root root  224 Jul 21 05:04 ..
+-rw-------.  1 root root 1407 Jul 21 05:09 anaconda-ks.cfg
+-rw-------.  1 root root  335 Jul 24 06:33 .bash_history
+-rw-r--r--.  1 root root   18 Aug 13  2018 .bash_logout
+-rw-r--r--.  1 root root  176 Aug 13  2018 .bash_profile
+-rw-r--r--.  1 root root  176 Aug 13  2018 .bashrc
+drwx------. 10 root root  230 Jul 21 05:19 .cache
+drwx------. 11 root root  215 Jul 24 06:27 .config
+-rw-r--r--.  1 root root  100 Aug 13  2018 .cshrc
+drwx------.  3 root root   25 Jul 21 05:16 .dbus
+drwxr-xr-x.  2 root root    6 Jul 21 05:19 Desktop
+drwxr-xr-x.  2 root root    6 Jul 21 05:19 Documents
+drwxr-xr-x.  2 root root    6 Jul 21 05:19 Downloads
+-rw-------.  1 root root   16 Jul 21 05:19 .esd_auth
+-rw-------.  1 root root  620 Jul 24 06:26 .ICEauthority
+-rw-r--r--.  1 root root 1562 Jul 21 05:18 initial-setup-ks.cfg
+drwx------.  3 root root   19 Jul 21 05:19 .local
+drwxr-xr-x.  2 root root    6 Jul 21 05:19 Music
+drwxr-xr-x.  2 root root    6 Jul 21 05:19 Pictures
+drwxr-----.  3 root root   19 Jul 21 05:19 .pki
+drwxr-xr-x.  2 root root    6 Jul 21 05:19 Public
+-rw-r--r--.  1 root root  129 Aug 13  2018 .tcshrc
+drwxr-xr-x.  2 root root    6 Jul 21 05:19 Templates
+drwxr-xr-x.  2 root root    6 Jul 21 05:19 Videos
+-rw-------.  1 root root 3235 Jul 24 06:32 .viminfo
+```
