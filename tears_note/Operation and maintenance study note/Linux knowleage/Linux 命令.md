@@ -758,6 +758,355 @@ dbus
 
 ## 4.10 diff
 
+用于比较多个文件之间内容的差异，英文全称为“different”，语法格式为“diff [参数] 文件名称A 文件名称B”
+
+在使用diff命令时，不仅可以使用--brief参数来确认两个文件是否相同，还可以使用-c参数来详细比较出多个文件的差异之处。这绝对是判断文件是否被篡改的有力神器。例如，先使用cat命令分别查看diff_A.txt和diff_B.txt文件的内容，然后进行比较
+
+使用diff --brief命令显示比较后的结果，判断文件是否相同：
+
+```shell
+[root@linuxprobe ~]# diff --brief diff_A.txt diff_B.txt
+Files diff_A.txt and diff_B.txt differ
+```
+
+最后使用带有-c参数的diff命令来描述文件内容具体的不同：
+
+```shell
+[root@linuxprobe ~]# diff -c diff_A.txt diff_B.txt
+*** diff_A.txt 2020-08-30 18:07:45.230864626 +0800
+--- diff_B.txt 2020-08-30 18:08:52.203860389 +0800
+***************
+*** 1,5 ****
+! Welcome to linuxprobe.com
+Red Hat certified
+! Free Linux Lessons
+Professional guidance
+Linux Course
+--- 1,7 ----
+! Welcome tooo linuxprobe.com
+!
+Red Hat certified
+! Free Linux LeSSonS
+! ////////.....////////
+Professional guidance
+Linux Course
+```
+
 ## 4.11 uniq
 
+用于去除文本中连续的重复行，英文全称为“unique”，语法格式为“uniq [参数] 文件名称”
+
+该命令的作用是用来去除文本文件中连续的重复行，中间不能夹杂其他文本行（非相邻的默认不会去重）—去除了重复的，保留的都是唯一的，自然也就是“独特的”“唯一的”了。
+
+我们使用uniq命令对两个文本内容进行操作，区别一目了然：
+
+eg:
+
+```
+[root@linuxprobe ~]# cat uniq.txt 
+Welcome to linuxprobe.com
+Welcome to linuxprobe.com
+Welcome to linuxprobe.com
+Welcome to linuxprobe.com
+Red Hat certified
+Free Linux Lessons
+Professional guidance
+Linux Course
+[root@linuxprobe ~]# uniq uniq.txt 
+Welcome to linuxprobe.com
+Red Hat certified
+Free Linux Lessons
+Professional guidance
+Linux Course
+```
+
 ## 4.12 sort
+
+用于对文本内容进行再排序，语法格式为“sort [参数] 文件名称”
+
+ sort命令中的参数及其作用
+
+| 参数 | 作用           |
+| ---- | -------------- |
+| -f   | 忽略大小写     |
+| -b   | 忽略缩进与空格 |
+| -n   | 以数值型排序   |
+| -r   | 反向排序       |
+| -u   | 去除重复行     |
+| -t   | 指定间隔符     |
+| -k   | 设置字段范围   |
+
+下面的内容节选自/etc/passwd文件中的前5个字段，并且进行了混乱排序。
+
+```
+[root@linuxprobe ~]# cat user.txt 
+tss:x:59:59:Account used by the trousers package to sandbox the tcsd daemon
+polkitd:x:998:996:User for polkitd
+geoclue:x:997:995:User for geoclue
+rtkit:x:172:172:RealtimeKit
+pulse:x:171:171:PulseAudio System Daemon
+qemu:x:107:107:qemu user
+usbmuxd:x:113:113:usbmuxd user
+unbound:x:996:991:Unbound DNS resolver
+rpc:x:32:32:Rpcbind Daemon
+gluster:x:995:990:GlusterFS daemons
+```
+
+不难看出，上面其实是5个字段，各个字段之间是用了冒号进行间隔，如果想以第3个字段中的数字作为排序依据，那么可以用-t参数指定间隔符，用-k参数指定第几列，用-n参数进行数字排序来搞定：
+
+```
+[root@linuxprobe ~]# sort -t : -k 3 -n user.txt 
+rpc:x:32:32:Rpcbind Daemon
+tss:x:59:59:Account used by the trousers package to sandbox the tcsd daemon
+qemu:x:107:107:qemu user
+usbmuxd:x:113:113:usbmuxd user
+pulse:x:171:171:PulseAudio System Daemon
+rtkit:x:172:172:RealtimeKit
+gluster:x:995:990:GlusterFS daemons
+unbound:x:996:991:Unbound DNS resolver
+geoclue:x:997:995:User for geoclue
+polkitd:x:998:996:User for polkitd
+```
+
+# 五、**文件目录管理命令**
+
+## 5.1．touch命令
+
+touch命令用于创建空白文件或设置文件的时间，语法格式为“touch [参数] 文件名称”。
+
+在创建空白的文本文件方面，这个touch命令相当简洁，简捷到没有必要铺开去讲。比如，touch linuxprobe命令可以创建出一个名为linuxprobe的空白文本文件。对touch命令来讲，有难度的操作主要是体现在设置文件内容的修改时间（Mtime）、文件权限或属性的更改时间（Ctime）与文件的访问时间（Atime）上面。touch命令的参数及其作用如表2-17所示。
+
+​                       touch命令中的参数及其作用
+
+| 参数 | 作用                      |
+| ---- | ------------------------- |
+| -a   | 仅修改“读取时间”（atime） |
+| -m   | 仅修改“修改时间”（mtime） |
+| -d   | 同时修改atime与mtime      |
+
+
+
+接下来，先使用ls命令查看一个文件的修改时间，随后修改这个文件，最后再查看一下文件的修改时间，看是否发生了变化：
+
+```
+[root@linuxprobe ~]# ls -l anaconda-ks.cfg
+-rw-------. 1 root root 1213 May  4 15:44 anaconda-ks.cfg
+[root@linuxprobe ~]# echo "Visit the LinuxProbe.com to learn linux skills" >> anaconda-ks.cfg
+[root@linuxprobe ~]# ls -l anaconda-ks.cfg
+-rw-------. 1 root root 1260 Aug  2 01:26 anaconda-ks.cfg
+```
+
+如果不想让别人知道我们修改了它，那么这时就可以用touch命令把修改后的文件时间设置成修改之前的时间（很多黑客就是这样做的呢）：
+
+```
+[root@linuxprobe ~]# touch -d "2020-05-04 15:44" anaconda-ks.cfg 
+[root@linuxprobe ~]# ls -l anaconda-ks.cfg 
+-rw-------. 1 root root 1260 May  4 15:44 anaconda-ks.cfg
+```
+
+## **5.2 mkdir命令**
+
+mkdir命令用于创建空白的目录，英文全称为“make directory”，语法格式为“mkdir [参数] 目录名称”。
+
+除了能创建单个空白目录外，mkdir命令还可以结合-p参数来递归创建出具有嵌套层叠关系的文件目录：
+
+```
+[root@linuxprobe ~]# mkdir linuxprobe
+[root@linuxprobe ~]# cd linuxprobe
+[root@linuxprobe linuxprobe]# mkdir -p a/b/c/d/e
+[root@linuxprobe linuxprobe]# cd a
+[root@linuxprobe a]# cd b
+[root@linuxprobe b]#
+```
+
+## **5.3 cp命令**
+
+cp命令用于复制文件或目录，英文全称为“copy”，语法格式为“cp [参数] 源文件名称 目标文件名称”。
+
+大家对文件复制操作应该不陌生，几乎每天都会使用到。在Linux系统中，复制操作具体分为3种情况：
+
+> 如果目标文件是目录，则会把源文件复制到该目录中；
+>
+> 如果目标文件也是普通文件，则会询问是否要覆盖它；
+>
+> 如果目标文件不存在，则执行正常的复制操作。
+
+复制命令基本不会出错，唯一需要记住的就是在复制目录时要加上-r参数。cp命令的参数及其作用如表2-18所示。
+
+​                       cp命令中的参数及其作用
+
+| 参数 | 作用                                         |
+| ---- | -------------------------------------------- |
+| -p   | 保留原始文件的属性                           |
+| -d   | 若对象为“链接文件”，则保留该“链接文件”的属性 |
+| -r   | 递归持续复制（用于目录）                     |
+| -i   | 若目标文件存在则询问是否覆盖                 |
+| -a   | 相当于-pdr（p、d、r为上述参数）              |
+
+
+
+接下来，使用touch命令创建一个名为install.log的普通空白文件，然后将其复制为一份名为x.log的备份文件，最后再使用ls命令查看目录中的文件
+
+```
+[root@linuxprobe ~]# touch install.log
+[root@linuxprobe ~]# cp install.log x.log
+[root@linuxprobe ~]# ls
+install.log x.log
+```
+
+## **5.4 mv命令**
+
+mv命令用于剪切或重命名文件，英文全称为“move”，语法格式为“mv [参数] 源文件名称 目标文件名称”。
+
+剪切操作不同于复制操作，因为它默认会把源文件删除，只保留剪切后的文件。如果在同一个目录中将某个文件剪切后还粘贴到当前目录下，其实也就是对该文件进行了重命名操作：
+
+```
+[root@linuxprobe ~]# mv x.log linux.log
+[root@linuxprobe ~]# ls
+install.log linux.log
+```
+
+## **5.5 rm命令**
+
+rm命令用于删除文件或目录，英文全称为“remove”，语法格式为“rm [参数] 文件  名称”。
+
+在Linux系统中删除文件时，系统会默认向您询问是否要执行删除操作，如果不想总是看到这种反复的确认信息，可在rm命令后跟上-f参数来强制删除。另外，要想删除一个目录，需要在rm命令后面加一个-r参数才可以，否则删除不掉。rm命令的参数及其作用如表2-19所示。
+
+​                       rm命令中的参数及其作用
+
+| 参数 | 作用       |
+| ---- | ---------- |
+| -f   | 强制执行   |
+| -i   | 删除前询问 |
+| -r   | 删除目录   |
+| -v   | 显示过程   |
+
+
+
+下面尝试删除前面创建的install.log和linux.log文件，大家感受一下加与不加-f参数的区别：
+
+```
+[root@linuxprobe ~]# rm install.log
+rm: remove regular empty file ‘install.log’? y
+[root@linuxprobe ~]# rm -f linux.log
+[root@linuxprobe ~]# ls
+[root@linuxprobe ~]#
+```
+
+## **5.6 dd命令**
+
+dd命令用于按照指定大小和个数的数据块来复制文件或转换文件，语法格式为“dd if=参数值of=参数值count=参数值bs=参数值”。
+
+dd命令是一个比较重要而且比较有特色的命令，它能够让用户按照指定大小和个数的数据块来复制文件的内容。当然，如果愿意的话，还可以在复制过程中转换其中的数据。Linux系统中有一个名为/dev/zero的设备文件。这个文件不会占用系统存储空间，但却可以提供无穷无尽的数据，因此常常使用它作为dd命令的输入文件，来生成一个指定大小的文件。
+
+​                      dd命令中的参数及其作用
+
+| 参数  | 作用                 |
+| ----- | -------------------- |
+| if    | 输入的文件名称       |
+| of    | 输出的文件名称       |
+| bs    | 设置每个“块”的大小   |
+| count | 设置要复制“块”的个数 |
+
+
+
+例如，用dd命令从/dev/zero设备文件中取出一个大小为560MB的数据块，然后保存成名为560_file的文件。在理解了这个命令后，以后就能随意创建任意大小的文件了：
+
+```
+[root@linuxprobe ~]# dd if=/dev/zero of=560_file count=1 bs=560M
+1+0 records in
+1+0 records out
+587202560 bytes (587 MB, 560 MiB) copied, 1.28667 s, 456 MB/s
+```
+
+dd命令的功能也绝不仅限于复制文件这么简单。如果想把光驱设备中的光盘制作成iso格式的镜像文件，在Windows系统中需要借助于第三方软件才能做到，但在Linux系统中可以直接使用dd命令来压制出光盘镜像文件，将它变成一个可立即使用的iso镜像：
+
+```
+[root@linuxprobe ~]# dd if=/dev/cdrom of=RHEL-server-8.0-x86_64-LinuxProbe.Com.iso
+13873152+0 records in
+13873152+0 records out
+7103053824 bytes (7.1 GB, 6.6 GiB) copied, 27.8812 s, 255 MB/s
+```
+
+考虑到有些读者会纠结bs块大小与count块个数的关系，下面举一个吃货的例子进行解释。假设小明的饭量（即需求）是一个固定的值，用来盛饭的勺子的大小是bs块的大小，而用勺子盛饭的次数则是count块的个数。小明要想吃饱（满足需求），则需要在勺子大小（bs块大小）与用勺子盛饭的次数（count块个数）之间进行平衡。勺子越大，用勺子盛饭的次数就越少。由上可见，bs与count都是用来指定容量的大小，只要能满足需求，可随意组合搭配方式。
+
+## **5.7 file命令**
+
+file命令用于查看文件的类型，语法格式为“file文件名称”。
+
+在Linux系统中，由于文本、目录、设备等所有这些一切都统称为文件，但是它们又不像Windows系统那样都有后缀，因此很难通过文件名一眼判断出具体的文件类型，这时就需要使用file命令来查看文件类型了。
+
+```
+[root@linuxprobe ~]# file anaconda-ks.cfg 
+anaconda-ks.cfg: ASCII text
+[root@linuxprobe ~]# file /dev/sda
+/dev/sda: block special
+```
+
+### **Tips**
+
+在Windows系统中打开文件时，一般是通过用户双击鼠标完成的，系统会自行判断用户双击的文件是什么类型，因此需要有后缀进行区别。而Linux系统则是根据用户执行的命令来调用文件，例如执行cat命令查看文本，执行bash命令执行脚本等，所以也就不需要强制让用户给文件设置后缀了。
+
+## **5.8 tar命令**
+
+tar命令用于对文件进行打包压缩或解压，语法格式为“tar参数 文件名称”。
+
+在网络上，人们越来越倾向于传输压缩格式的文件，原因是压缩文件的体积小，在网速相同的情况下，体积越小则传输时间越短。在Linux系统中，主要使用的是.tar、.tar.gz或.tar.bz2格式，大家不用担心格式太多而记不住，其实这些格式大部分都是由tar命令生成的。
+
+​                     tar命令中的参数及其作用
+
+| 参数 | 作用                   |
+| ---- | ---------------------- |
+| -c   | 创建压缩文件           |
+| -x   | 解开压缩文件           |
+| -t   | 查看压缩包内有哪些文件 |
+| -z   | 用Gzip压缩或解压       |
+| -j   | 用bzip2压缩或解压      |
+| -v   | 显示压缩或解压的过程   |
+| -f   | 目标文件名             |
+| -p   | 保留原始的权限与属性   |
+| -P   | 使用绝对路径来压缩     |
+| -C   | 指定解压到的目录       |
+
+
+
+首先，-c参数用于创建压缩文件，-x参数用于解压文件，因此这两个参数不能同时使用。其次，-z参数指定使用gzip格式来压缩或解压文件，-j参数指定使用bzip2格式来压缩或解压文件。用户使用时则是根据文件的后缀来决定应使用何种格式的参数进行解压。在执行某些压缩或解压操作时，可能需要花费数个小时，如果屏幕一直没有输出，您一方面不好判断打包的进度情况，另一方面也会怀疑电脑死机了，因此非常推荐使用-v参数向用户不断显示压缩或解压的过程。-C参数用于指定要解压到哪个指定的目录。-f参数特别重要，它必须放到参数的最后一位，代表要压缩或解压的软件包名称。刘遄老师一般使用“tar -czvf压缩包名称.tar.gz要打包的目录”命令把指定的文件进行打包压缩；相应的解压命令为“tar -xzvf压缩包名称.tar.gz”。下面我们逐个演示打包压缩与解压的操作，先使用tar命令把/etc目录通过gzip格式进行打包压缩，并把文件命名为etc.tar.gz：
+
+```
+[root@linuxprobe ~]# tar czvf etc.tar.gz /etc
+tar: Removing leading `/' from member names
+/etc/
+/etc/fstab
+/etc/crypttab
+/etc/mtab
+/etc/fonts/
+/etc/fonts/conf.d/
+/etc/fonts/conf.d/65-0-madan.conf
+/etc/fonts/conf.d/59-liberation-sans.conf
+/etc/fonts/conf.d/90-ttf-arphic-uming-embolden.conf
+/etc/fonts/conf.d/59-liberation-mono.conf
+/etc/fonts/conf.d/66-sil-nuosu.conf
+………………省略部分压缩过程信息………………
+```
+
+接下来将打包后的压缩包文件指定解压到/root/etc目录中（先使用mkdir命令创建/root/etc目录）：
+
+```
+[root@linuxprobe ~]# mkdir /root/etc
+[root@linuxprobe ~]# tar xzvf etc.tar.gz -C /root/etc
+etc/
+etc/fstab
+etc/crypttab
+etc/mtab
+etc/fonts/
+etc/fonts/conf.d/
+etc/fonts/conf.d/65-0-madan.conf
+etc/fonts/conf.d/59-liberation-sans.conf
+etc/fonts/conf.d/90-ttf-arphic-uming-embolden.conf
+etc/fonts/conf.d/59-liberation-mono.conf
+etc/fonts/conf.d/66-sil-nuosu.conf
+etc/fonts/conf.d/65-1-vlgothic-gothic.conf
+etc/fonts/conf.d/65-0-lohit-bengali.conf
+etc/fonts/conf.d/20-unhint-small-dejavu-sans.conf
+………………省略部分解压过程信息………………
+```
