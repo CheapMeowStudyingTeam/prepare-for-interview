@@ -163,7 +163,7 @@ Red Hat Enterprise Linux release 8.0 (Ootpa)
 22:49:55 up 10 min, 1 users, load average: 0.01, 0.19, 0.18
 ```
 
-## 2.4**free**
+## 2.4 **free**
 
 用于显示当前系统中内存的使用量信息，语法格式为“free [-h]”
 
@@ -265,7 +265,7 @@ udp6       0      0 [::]:mdns               [::]:*
 udp6       0      0 [::]:38541              [::]:*       
 ```
 
-## 2.9 history命令
+## 2.9 history
 
 用于显示执行过的命令历史，语法格式为“history [-c]”
 
@@ -305,7 +305,7 @@ Red Hat Enterprise Linux release 8.0 (Ootpa)
 
 # 三、**查找定位文件命令**
 
-## 3.1pwd
+## 3.1 pwd
 
 用于显示用户当前所处的工作目录，英文全称为“print working directory”
 
@@ -314,7 +314,7 @@ Red Hat Enterprise Linux release 8.0 (Ootpa)
 /etc
 ```
 
-## 3.2cd
+## 3.2 cd
 
 用于切换当前的工作路径，英文全称为“change directory”，语法格式为“cd [参数] [目录]”
 
@@ -870,7 +870,7 @@ polkitd:x:998:996:User for polkitd
 
 # 五、**文件目录管理命令**
 
-## 5.1．touch命令
+## 5.1 touch命令
 
 touch命令用于创建空白文件或设置文件的时间，语法格式为“touch [参数] 文件名称”。
 
