@@ -2268,11 +2268,9 @@ for(int i = 0; i < stones.size(); ++i){
 
 那么 `sum - dp[target] - dp[target]` 就是两堆石头的重量的差值
 
-### 最长递增子序列
+### 用一个动规状态表示一定选 i 时候的一个区间中的最优结果
 
-为什么单独开一类……因为从这题延伸出来的，我在笔试遇到了，但是我不会写
-
-#### 基础
+#### 最长递增子序列
 
 给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
 
@@ -2308,15 +2306,13 @@ for(int i = 0; i < stones.size(); ++i){
 
 你能将算法的时间复杂度降低到 O(n log(n)) 吗?
 
-动规解法 1
+动规
 
 `dp[i]` 表示考虑第 0 到 i 个元素，选取第 i 个数字结尾的最长递增子序列的长度
 
-那么 `dp[i] = max(dp[j]) + 1, 0 <= j < i`
+于是更新一个新的 i 的时候，往后找，看看那些比自己 nums[i] 还小的数的 dp 值，取其中最大的 + 1
 
-注意，`dp[i]` 所代表的最长递增子序列中，一定有 `nums[i]`
-
-> `dp[i]` 需要表示一个范围，其实你可以发现，即使你一开始什么都不知道，dp 数组的序号 i 很多时候，他虽然只是一个数，但是却表示了一个范围
+> `dp[i]` 可以表示一个范围。其实你可以发现，即使你一开始什么都不知道，dp 数组的序号 i 很多时候，他虽然只是一个数，但是却表示了一个范围
 >
 > 因为这就是 dp 的意义，就是他一个数是要表示一个状态的，而这个状态是和旧的状态之间是要有联系的，是有因果关系的，所以如果一个数按照一个规则表示一个范围，那就是相当于这一个属考虑到了它的历史
 
@@ -2330,97 +2326,13 @@ for(int i = 0; i < stones.size(); ++i){
 >
 > 所以变化的那个数的选择是从后往前选取
 
-
-```cpp
-class Solution {
-public:
-    int lengthOfLIS(vector<int>& nums) {
-        int* dp = new int[nums.size()] {0};
-
-        int ans = 1;
-
-        dp[0] = 1;
-
-        for(int i = 1; i < nums.size(); ++i){
-            int maxSubLength = 0;
-
-            // 选取 0~i-1 的区间中最长的那个子数组
-            for(int j = 0; j < i; ++j){
-                // 选择最长的子数组要满足的条件是，要递增
-                // 那么就是比较最后一个元素
-                if(nums[j] < nums[i]){
-                    maxSubLength = max(dp[j], maxSubLength);
-                }
-            }
-
-            // 选取到最长的，且满足条件的子数组，向他的后面添加一个数
-            dp[i] = maxSubLength + 1;
-
-            ans = max(dp[i], ans);
-        }
-
-        delete[] dp;
-
-        return ans;
-    }
-
-    
-};
-```
-
-解法 2：贪心
-
-贪心解法更巧妙
-
-[https://leetcode.cn/problems/longest-increasing-subsequence/solutions/147667/zui-chang-shang-sheng-zi-xu-lie-by-leetcode-soluti/](https://leetcode.cn/problems/longest-increasing-subsequence/solutions/147667/zui-chang-shang-sheng-zi-xu-lie-by-leetcode-soluti/)
-
-核心思想是：如果我们要使上升子序列尽可能的长，则我们需要让序列上升得尽可能慢，因此我们希望每次在上升子序列最后加上的那个数尽可能的小。
-
-一开始我看到这个想法，我还以为那我就遍历 nums n 次，然后每一次选一个 nums 中比我最后一次选的值更小的数
-
-但是它要求的是子序列，那么数的顺序是不能变的
-
-如果要求顺序不可变，那么其实就不合理了……因为那你直接一次排序，不就能取到整个排序后的数组了？毕竟每次你要找一个最小增长，而已经递增的序列完美满足你的要求
-
-所以不是我这么想
-
-那么现在就是，我之后就想，遍历 n 次，每一次取 nums 第 i 个值为起点，然后往后找 nums 中每个元素，判断每个元素的时候都尽量取最小增长
-
-但是其实，我不知道怎么样才能得到最小增长
-
-然后看了他的题解
-
-他首先是假设了一个新的关系，就是
-
-数组 d[i]，表示长度为 i 的最长上升子序列的末尾元素的最小值
-
-设当前已求出的最长上升子序列的长度为 len 初始时为 1 从前往后遍历数组 nums，在遍历到 nums[i] 时
-
-1. 如果 `nums[i] > d[len]` 则直接加入到 `d` 数组末尾，并更新 `len++`
-
-2. 否则，在 `d` 数组中二分查找，找到第一个比 `nums[i]` 小的数 `d[k]`，并更新 `d[k + 1] = nums[i]`
-
-其实就是，d 数组是当前找到的上升子序列
-
-然后它的更新就是，不像一般的，插入到数组中的数就是最终答案
-
-他这里是，插入的数，之后可能会被替换，为什么被替换，因为你要找增长幅度最小
-
-但是怎么找？只要我每一个数都是容许内的最小，那么之后的数的增长幅度就可以比较小，因为我拉大了和后面的数之间的差距，之后可能有更多的比较小的数可以排在我后面
-
-同时我这个在容许内尽可能小的数，也与它之前的数的差距会尽可能小
-
-那么完成这个容许内的最小的方法，就是在现有的子序列中找到一个刚好大于它的数，并替换掉
-
-![alt text](image-18.jpg)
-
 #### 无重叠区间
 
 给定一个区间的集合 intervals ，其中 intervals[i] = [starti, endi] 。返回 需要移除区间的最小数量，使剩余区间互不重叠 。
 
 示例 1:
 
-输入: intervals = [[1,2],[2,3],[3,4],[1,3]]
+输入: `intervals = [[1,2],[2,3],[3,4],[1,3]]`
 
 输出: 1
 
@@ -2428,7 +2340,7 @@ public:
 
 示例 2:
 
-输入: intervals = [ [1,2], [1,2], [1,2] ]
+输入: `intervals = [ [1,2], [1,2], [1,2] ]`
 
 输出: 2
 
@@ -2436,7 +2348,7 @@ public:
 
 示例 3:
 
-输入: intervals = [ [1,2], [2,3] ]
+输入: `intervals = [ [1,2], [2,3] ]`
 
 输出: 0
 
@@ -2456,186 +2368,9 @@ intervals[i].length == 2
 
 去掉最少数量的区间，其实就是在求无重叠区间序列的长度的最大值
 
-```cpp
-// 动规
-// dp[i] 表示 0~i 个区间中，构成递增无重叠区间的最大长度
-// dp[i] 表示一定选取第 i 个
-// 那么创建 dp[i] 的时候就要从前面那些之中选出与 intervals[i]
-// 互不重叠的，并且能够叠加上来的
-class Solution {
-public:
-    int eraseOverlapIntervals(vector<vector<int>>& intervals) {
-        int n = intervals.size();
-        if (n == 0) {
-            return 0;
-        }
-
-        sort(intervals.begin(), intervals.end(),
-             [](vector<int>& lhs, vector<int>& rhs) -> bool {
-                 return lhs[0] < rhs[0];
-             });
-
-        int ans = 0;
-
-        int* dp = new int[n]{1};
-
-        dp[0] = 1;
-        for (int i = 0; i < n; ++i) {
-            int maxLength = 0;
-            for (int j = 0; j < i; ++j) {
-                if (intervals[j][1] <= intervals[i][0]) {
-                    maxLength = max(dp[j], maxLength);
-                }
-            }
-            dp[i] = maxLength + 1;
-            ans = max(dp[i], ans);
-        }
-
-        return n - ans;
-    }
-};
-```
-
-核心在于对 `dp[i]` 的更新
-
-最长递增子序列中，需要取子序列，所以不能排序
-
-但是这里需要判断是否能相连接上，最简单的方法就是只判断能否连接到尾部
-
-那么只要是区间不断递增地连接上来，我就可以只判断连接到尾部
+然后每次找比当前区间序号 i 更小的，能够跟自己拼接的区间的 dp 之间的最大值，再 + 1 表示拼接上
 
 动规解法超时了
-
-解法 2：贪心
-
-一开始我是想着要不要替换
-
-```cpp
-// 贪心
-// 先依次加入各个区间到尾部
-// 但是加入每个区间的时候，都在已经加入的区间的列表中寻找第一个能替换掉的，自身长度比之更小的区间
-// 并替换
-class Solution {
-public:
-    int eraseOverlapIntervals(vector<vector<int>>& intervals) {
-        int n = intervals.size();
-        if (n == 0) {
-            return 0;
-        }
-
-        sort(intervals.begin(), intervals.end(),
-             [](vector<int>& lhs, vector<int>& rhs) -> bool {
-                 return lhs[0] < rhs[0];
-             });
-
-        vector<vector<int>> cur_intervals;
-
-        for (vector<int>& interval : intervals) {
-            int index =
-                quickFind(cur_intervals, interval, 0, cur_intervals.size() - 1);
-            if (index == -1) {
-                if (cur_intervals.size() == 0) {
-                    cur_intervals.push_back(interval);
-                }
-
-                if (cur_intervals[cur_intervals.size() - 1][1] <= interval[0]) {
-                    cur_intervals.push_back(interval);
-                }
-            } else {
-                cur_intervals[index] = interval;
-            }
-        }
-
-        return intervals.size() - cur_intervals.size();
-    }
-
-    int quickFind(vector<vector<int>>& intervals, vector<int>& target,
-                  int begin, int end) {
-        if (begin > end) {
-            return -1;
-        }
-
-        int mid = begin + (end - begin) / 2;
-
-        if (target[0] >= intervals[mid][0] && target[1] <= intervals[mid][1]) {
-            return mid;
-        } else if (target[0] >= intervals[mid][1]) {
-            return quickFind(intervals, target, begin, mid - 1);
-        } else if (target[1] <= intervals[mid][0]) {
-            return quickFind(intervals, target, mid + 1, end);
-        }
-
-        return -1;
-    }
-};
-```
-
-解答错误。后来发现这题还有点不一样，不是单纯替换就能搞定的
-
-似乎我还要找能够插入的位置
-
-我想的是二分查找找到一个 `index`
-
-```cpp
-// 如果是替换
-if(target[0] >= intervals[index][0] && target[1] <= intervals[index][1]){
-    cur_intervals[index] = interval;
-}
-// 如果是插入
-if(target[0] >= intervals[index][1] && target[1] <= intervals[index + 1][0]){
-    cur_intervals.insert(cur_intervals.begin() + index, target);
-}
-```
-
-官方题解：
-
->他要想的是选取哪个区间作为首区间
->
->现在思路又换成了，每一步找到最优了
->
->而不是之前的，先把所有的数都填上，之后可以替换
-
-假设在某一种最优的选择方法中，[lk rk] 是首个（即最左侧的）区间，那么它的左侧没有其它区间，右侧有若干个不重叠的区间。设想一下，如果此时存在一个区间 [lj, rj]，使得 rj < rk，即区间 j 的右端点在区间 k 的左侧，那么我们将区间 k 替换为区间 j，其与剩余右侧被选择的区间仍然是不重叠的。而当我们将区间 k 替换为区间 j 后，就得到了另一种最优的选择方法。
-
-我们可以不断地寻找右端点在首个区间右端点左侧的新区间，将首个区间替换成该区间。那么当我们无法替换时，首个区间就是所有可以选择的区间中右端点最小的那个区间。因此我们将所有区间按照右端点从小到大进行排序，那么排完序之后的首个区间，就是我们选择的首个区间。
-
-如果有多个区间的右端点都同样最小怎么办？由于我们选择的是首个区间，因此在左侧不会有其它的区间，那么左端点在何处是不重要的，我们只要任意选择一个右端点最小的区间即可。
-
-当确定了首个区间之后，所有与首个区间不重合的区间就组成了一个规模更小的子问题。由于我们已经在初始时将所有区间按照右端点排好序了，因此对于这个子问题，我们无需再次进行排序，只要找出其中与首个区间不重合并且右端点最小的区间即可。用相同的方法，我们可以依次确定后续的所有区间。
-
-在实际的代码编写中，我们对按照右端点排好序的区间进行遍历，并且实时维护上一个选择区间的右端点 right 。如果当前遍历到的区间 [li, ri] 与上一个区间不重合，即 li > right，那么我们就可以贪心地选择这个区间，并将 right 更新为 ri
-
-```cpp
-// 贪心
-// 先依次加入各个区间到尾部
-// 但是加入每个区间的时候，都在已经加入的区间的列表中寻找第一个能替换掉的，自身长度比之更小的区间
-// 并替换
-class Solution {
-public:
-    int eraseOverlapIntervals(vector<vector<int>>& intervals) {
-        int n = intervals.size();
-        if (n == 0) {
-            return 0;
-        }
-
-        sort(intervals.begin(), intervals.end(),
-             [](vector<int>& lhs, vector<int>& rhs) -> bool {
-                 return lhs[1] < rhs[1];
-             });
-
-        int right = INT_MIN;
-        int count = 0;
-        for(auto& interval : intervals){
-            if(right <= interval[0]){
-                right = interval[1];
-                ++count;
-            }
-        }
-
-        return n - count;
-    }
-};
-```
 
 #### 最长数对链
 
