@@ -251,7 +251,7 @@ static int my_int = CreateMyInt();
 
 纯虚函数必须由子类实现
 
-### 虚表指针、虚函数表什么时候产生
+### 虚表指针、虚函数表什么时候产生，存在哪里
 
 虚函数表指针随对象走，它发生在对象运行期，当对象创建的时候，虚函数表表指针位于该对象所在内存的最前面。
 
@@ -530,3 +530,6 @@ private:
 [https://stackoverflow.com/questions/3629835/why-is-stdfunction-not-equality-comparable](https://stackoverflow.com/questions/3629835/why-is-stdfunction-not-equality-comparable)
 
 原因应该是因为同一个函数的包装可能不同，但是语义相同，要根据包装来猜语义是不是相同会比较艰难
+
+### 智能指针
+
